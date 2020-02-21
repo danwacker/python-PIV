@@ -8,16 +8,20 @@ def PyPIV_FFT(image1,image2,sectionSize,step):
     threshold = 1;
     
 #importing pictures into arrays
-    img1 = Image.open(image1)
-    img2 = Image.open(image2)
-    imArray1 = np.array(img1)
-    imArray2 = np.array(img2)
+#    img1 = Image.open(image1)
+#    img2 = Image.open(image2)
+#    imArray1 = np.array(img1)
+#    imArray2 = np.array(img2)
 
+    imArray1 = image1
+    imArray2 = image2
 #calculating important numbers
-    width, height = imArray1.shape
+    width, height = np.shape(imArray1)
     #number of steps
     hstep = int(width//step-(sectionSize//step-1))
     vstep = int(height//step-(sectionSize//step-1))
+    
+    print(hstep,vstep,width,height,sectionSize,step)
     
     #velocity arrays
     vx = np.zeros([hstep, vstep])
@@ -85,4 +89,12 @@ def PyPIV_FFT(image1,image2,sectionSize,step):
 #            medvx[i,j] = np.median(vx[i-1:i+2,j])
 #            medvy[i,j] = np.median(vy[i,j-1:j+2])
             
-    return medvx,medvy
+    x = np.zeros_like(medvx)        
+    y = x
+    dims = np.shape(x)
+    for i in range(dims[0]):
+        for j in range(dims[1]):
+            x[i,j] = i*step + sectionSize//2
+            y[i,j] = j*step + sectionSize//2
+                
+    return x,y,medvx,medvy

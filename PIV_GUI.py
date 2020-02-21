@@ -32,6 +32,9 @@ class PIV_GUI():
         #create a font
         self.font = QFont('SansSerif',13)
         
+        #declare variables
+        self.imagearray = np.zeros((2,2,2))
+        
         #creates button connected to file selection routine
         self.fileSelection = QPushButton(window)
         self.fileSelection.setText('Choose Images')
@@ -93,6 +96,21 @@ class PIV_GUI():
         self.Xcorr_window = QWidget()
         self.Xcorr_window.setGeometry(200,200,500,500)
         
+        self.outdir = QPushButton('Choose Output Directory',self.Xcorr_window)
+        self.outdir.move(0,0)
+        self.outdir.setFont(self.font)
+        self.outdir.clicked.connect(self.direcSelection)
+        
+        self.fftbutton = QPushButton('Run FFT',self.Xcorr_window)
+        self.fftbutton.move(30,0)
+        self.fftbutton.setFont(self.font)
+        self.fftbutton.clicked.connect(self.FFT_analysis)
+        
+        #brings up window
+        self.Xcorr_window.show()
+        
+    def direcSelection(self):
+        self.outdirec = QFileDialog.getExistingDirectory()
         
         
         
@@ -102,20 +120,28 @@ class PIV_GUI():
         
 #calls the FFT function with objects from the main window
     def FFT_analysis(self):
-        for i in range(self.imagearray.shape(3)-1):
-#            v,u = PyPIV_FFT(self.imagearray[:,:,i], self.imagearray[:,:,i+1], WinSize???, stepSize????)
+        print(self.imagearray[:,:,0])
+        imshape = np.shape(self.imagearray)
+        for i in range(imshape[2]-1):
+            head = 'image %d and %d x,y,u,v' % (i,(i+1))
+            x,y,u,v = PyPIV_FFT(self.imagearray[:,:,i], self.imagearray[:,:,i+1], self.windowSize.value, self.stepSize.value)
+            filename = self.outdirec + 'PIV_%04d.txt' % i
+            dims = np.shape(x)
+            out = np.array([np.reshape(x,(1,dims[0]*dims[1])), np.reshape(y,(1,dims[0]*dims[1])), np.reshape(u,(1,dims[0]*dims[1])), np.reshape(v,(1,dims[0]*dims[1]))])
+            np.savetxt(filename,out,fmt='%03.5f',delimiter='\t',header=head)
         
-            #complicated matplotlib to pyqt stuff
-            fig,ax = plt.subplots(figsize=(30, 20))
-#            ax.quiver(u,v,headwidth=2,headlength=3)
-            plt.savefig('out.png')
         
-            self.figwin.setGeometry(500,300,1100,800)
-            pic = QLabel(self.figwin)
-            graph = QPixmap('out.png')
-            pic.setPixmap(graph.scaledToWidth(1000))
-            self.figwin.show()
-        
+#            #complicated matplotlib to pyqt stuff
+#            fig,ax = plt.subplots(figsize=(30, 20))
+##            ax.quiver(u,v,headwidth=2,headlength=3)
+#            plt.savefig('out.png')
+#        
+#            self.figwin.setGeometry(500,300,1100,800)
+#            pic = QLabel(self.figwin)
+#            graph = QPixmap('out.png')
+#            pic.setPixmap(graph.scaledToWidth(1000))
+#            self.figwin.show()
+#        
         
         
         
@@ -260,7 +286,7 @@ class PIV_GUI():
         #shape imarray with sample image
         files = glob.glob(self.directory.text() + self.basename.text() + '*' + self.filetype.text())
         dim = np.shape(np.array(Image.open(files[0])))
-        self.imarray = np.zeros((dim[0], dim[1], int(self.numimages.text())))
+        self.imagearray = np.zeros((dim[0], dim[1], int(self.numimages.text())))
         
         #set up a string to show progress
         progressstr = '%d / ' + '%d' % int(self.numimages.text())
@@ -275,7 +301,7 @@ class PIV_GUI():
             QGuiApplication.processEvents()
             
             #actually fills the global imarray with images converted to arrays
-            self.imarray[:,:,i] = np.array(Image.open(filename % i))
+            self.imagearray[:,:,i] = np.array(Image.open(filename % i))
         
         self.loadwindow.close()
         
