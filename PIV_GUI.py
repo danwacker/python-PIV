@@ -89,20 +89,20 @@ class PIV_GUI():
         
         
         
-    #Cross correlation function
-    #checks if all necessary inputs are filled
-    #then opens a new window and passes it all the objects it needs to run the function
+    #creates window to run cross correlation from
     def Xcorr_run(self):
         self.Xcorr_window = QWidget()
         self.Xcorr_window.setGeometry(200,200,500,500)
         
+        #directory selection button
         self.outdir = QPushButton('Choose Output Directory',self.Xcorr_window)
         self.outdir.move(0,0)
         self.outdir.setFont(self.font)
         self.outdir.clicked.connect(self.direcSelection)
         
+        #button to initiate FFT
         self.fftbutton = QPushButton('Run FFT',self.Xcorr_window)
-        self.fftbutton.move(30,0)
+        self.fftbutton.move(0,40)
         self.fftbutton.setFont(self.font)
         self.fftbutton.clicked.connect(self.FFT_analysis)
         
@@ -117,19 +117,21 @@ class PIV_GUI():
         
         
         
-        
 #calls the FFT function with objects from the main window
     def FFT_analysis(self):
-        print(self.imagearray[:,:,0])
         imshape = np.shape(self.imagearray)
         for i in range(imshape[2]-1):
             head = 'image %d and %d x,y,u,v' % (i,(i+1))
+            
+            #funstion that computes the velocities through simple FFT
             x,y,u,v = PyPIV_FFT(self.imagearray[:,:,i], self.imagearray[:,:,i+1], self.windowSize.value, self.stepSize.value)
+            
+            #creating output file
             filename = self.outdirec + 'PIV_%04d.txt' % i
+            #shaping data for output file
             dims = np.shape(x)
-            out = np.array([np.reshape(x,(dims[0]*dims[1],1)), np.reshape(y,(dims[0]*dims[1],1)), np.reshape(u,(dims[0]*dims[1],1)), np.reshape(v,(dims[0]*dims[1],1))])
-            out = np.reshape(out,(dims[0]*dims[1],4))
-            np.savetxt(filename,out,fmt='%03.5f',delimiter='\t',header=head)
+            out = np.reshape(np.transpose([np.reshape(x,(1,dims[0]*dims[1])), np.reshape(y,(1,dims[0]*dims[1])), np.reshape(u,(1,dims[0]*dims[1])), np.reshape(v,(1,dims[0]*dims[1]))]),(dims[0]*dims[1],4))
+            np.savetxt(filename,out,fmt='%03.5f',delimiter='   ',header=head)
         
         
 #            #complicated matplotlib to pyqt stuff

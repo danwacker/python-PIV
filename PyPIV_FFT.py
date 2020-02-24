@@ -5,7 +5,7 @@ from Gauss_fitter import gauss_inter
 def PyPIV_FFT(image1,image2,sectionSize,step):
     
     #threshold for cross correlation strength
-    threshold = 1;
+    threshold = 0;
     
 #importing pictures into arrays
 #    img1 = Image.open(image1)
@@ -89,11 +89,11 @@ def PyPIV_FFT(image1,image2,sectionSize,step):
 #            medvy[i,j] = np.median(vy[i,j-1:j+2])
             
     x = np.zeros_like(medvx)        
-    y = x
+    y = np.zeros_like(medvx)
     dims = np.shape(x)
     for i in range(dims[0]):
         for j in range(dims[1]):
-            x[i,j] = i*step + sectionSize//2
-            y[i,j] = j*step + sectionSize//2
+            x[i,j] = j*step + sectionSize//2
+            y[i,j] = i*step + sectionSize//2
                 
     return x,y,medvx,medvy
