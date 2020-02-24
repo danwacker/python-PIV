@@ -21,7 +21,6 @@ def PyPIV_FFT(image1,image2,sectionSize,step):
     hstep = int(width//step-(sectionSize//step-1))
     vstep = int(height//step-(sectionSize//step-1))
     
-    print(hstep,vstep,width,height,sectionSize,step)
     
     #velocity arrays
     vx = np.zeros([hstep, vstep])

@@ -127,7 +127,8 @@ class PIV_GUI():
             x,y,u,v = PyPIV_FFT(self.imagearray[:,:,i], self.imagearray[:,:,i+1], self.windowSize.value, self.stepSize.value)
             filename = self.outdirec + 'PIV_%04d.txt' % i
             dims = np.shape(x)
-            out = np.array([np.reshape(x,(1,dims[0]*dims[1])), np.reshape(y,(1,dims[0]*dims[1])), np.reshape(u,(1,dims[0]*dims[1])), np.reshape(v,(1,dims[0]*dims[1]))])
+            out = np.array([np.reshape(x,(dims[0]*dims[1],1)), np.reshape(y,(dims[0]*dims[1],1)), np.reshape(u,(dims[0]*dims[1],1)), np.reshape(v,(dims[0]*dims[1],1))])
+            out = np.reshape(out,(dims[0]*dims[1],4))
             np.savetxt(filename,out,fmt='%03.5f',delimiter='\t',header=head)
         
         
