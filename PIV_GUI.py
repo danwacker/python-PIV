@@ -119,24 +119,50 @@ class PIV_GUI():
         
 #calls the FFT function with objects from the main window
     def FFT_analysis(self):
+        self.Xcorr_window.close()
+        self.progresswindow = QWidget()
+        self.progresswindow.setGeometry(300,300,200,200)
+        
+         #Labels to show progress 
+        self.imageloading = QLabel(self.progresswindow)
+        self.imageloading.move(0,0)
+        self.imageloading.setText('Analyzing Sets')
+        self.imageloading.setFont(self.font)
+        self.analysisprogress = QLabel(self.progresswindow)
+        self.analysisprogress.move(0,20)
+        self.analysisprogress.setText('                        ')
+        self.analysisprogress.setFont(self.font)
+        self.progresswindow.show()
+        
         imshape = np.shape(self.imagearray)
+        
+        progressstr = '%d / ' + '%d' % imshape[2]
+        self.analysisprogress.setText(progressstr % 0)
+        
+        
         for i in range(imshape[2]-1):
+            #update progress display
+            self.analysisprogress.setText(progressstr % i)
+            #necessary for updating the GUI while processes are running
+            QGuiApplication.processEvents()
+            
             head = 'image %d and %d x,y,u,v' % (i,(i+1))
             
             #funstion that computes the velocities through simple FFT
             x,y,u,v = PyPIV_FFT(self.imagearray[:,:,i], self.imagearray[:,:,i+1], self.windowSize.value, self.stepSize.value)
             
             #creating output file
-            filename = self.outdirec + 'PIV_%04d.txt' % i
+            filename = self.outdirec + '/PIV_%04d.txt' % i
             #shaping data for output file
             dims = np.shape(x)
             out = np.reshape(np.transpose([np.reshape(x,(1,dims[0]*dims[1])), np.reshape(y,(1,dims[0]*dims[1])), np.reshape(u,(1,dims[0]*dims[1])), np.reshape(v,(1,dims[0]*dims[1]))]),(dims[0]*dims[1],4))
             np.savetxt(filename,out,fmt='%03.5f',delimiter='   ',header=head)
         
-        
+#            self.figwin = QWidget()
+#            self.figwin.close()
 #            #complicated matplotlib to pyqt stuff
 #            fig,ax = plt.subplots(figsize=(30, 20))
-##            ax.quiver(u,v,headwidth=2,headlength=3)
+#            ax.quiver(u,v,headwidth=2,headlength=3)
 #            plt.savefig('out.png')
 #        
 #            self.figwin.setGeometry(500,300,1100,800)
@@ -144,8 +170,8 @@ class PIV_GUI():
 #            graph = QPixmap('out.png')
 #            pic.setPixmap(graph.scaledToWidth(1000))
 #            self.figwin.show()
-#        
         
+        self.progresswindow.close()
         
         
     def CNN_run(self):
