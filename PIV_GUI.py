@@ -15,8 +15,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-#main GUI file
-#run this one to run PyPIV program
+
 
 
 #this is the main class which everything runs from
@@ -139,7 +138,11 @@ class PIV_GUI():
         progressstr = '%d / ' + '%d' % imshape[2]
         self.analysisprogress.setText(progressstr % 0)
         
-        
+        self.figwin = QWidget()
+        self.figwin.show()
+        pic = QLabel(self.figwin)
+        self.figwin.setGeometry(500,300,1100,800)
+        self.figwin.show()
         for i in range(imshape[2]-1):
             #update progress display
             self.analysisprogress.setText(progressstr % i)
@@ -158,18 +161,16 @@ class PIV_GUI():
             out = np.reshape(np.transpose([np.reshape(x,(1,dims[0]*dims[1])), np.reshape(y,(1,dims[0]*dims[1])), np.reshape(u,(1,dims[0]*dims[1])), np.reshape(v,(1,dims[0]*dims[1]))]),(dims[0]*dims[1],4))
             np.savetxt(filename,out,fmt='%03.5f',delimiter='   ',header=head)
         
-#            self.figwin = QWidget()
-#            self.figwin.close()
-#            #complicated matplotlib to pyqt stuff
-#            fig,ax = plt.subplots(figsize=(30, 20))
-#            ax.quiver(u,v,headwidth=2,headlength=3)
-#            plt.savefig('out.png')
-#        
-#            self.figwin.setGeometry(500,300,1100,800)
-#            pic = QLabel(self.figwin)
-#            graph = QPixmap('out.png')
-#            pic.setPixmap(graph.scaledToWidth(1000))
-#            self.figwin.show()
+            
+            #complicated matplotlib to pyqt stuff
+            del pic
+            fig,ax = plt.subplots(figsize=(dims[1], dims[0]))
+            ax.quiver(u,v,headwidth=2,headlength=3)
+            plt.savefig('out.png')
+        
+            pic = QLabel(self.figwin)
+            graph = QPixmap('out.png')
+            pic.setPixmap(graph.scaledToWidth(300))
         
         self.progresswindow.close()
         
@@ -367,6 +368,3 @@ class checkBox(QRadioButton):
         self.move(x,(y+15))
         self.title.move(x,y)
         
-
-if __name__ == '__main__':
-    PIV_GUI()
