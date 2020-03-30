@@ -337,34 +337,3 @@ class PIV_GUI():
         
         
         
-        
-#Numerical Input Lines
-class inputBox(QLineEdit):
-    def __init__(self,title,window):
-        super(inputBox,self).__init__(window)
-        self.title = QLabel(window)
-        self.title.setText(title)
-        self.setValidator(QIntValidator())
-        self.textChanged.connect(self.change)
-        self.value = 0
-        
-    def change(self,num):
-        self.value = int(num)
-        
-        
-#Boolean input
-class checkBox(QRadioButton):
-    def __init__(self,title,window):
-        super(checkBox,self).__init__(window)
-        self.title = QLabel(window)
-        self.title.setText(title)
-        self.value = False
-        self.toggled.connect(self.change)
-        
-    def change(self, value):
-        self.value = value
-        
-    def mover(self,x,y):
-        self.move(x,(y+15))
-        self.title.move(x,y)
-        
