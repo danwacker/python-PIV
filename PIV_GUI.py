@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-
+from GUI_objects import PYPIV_window, PYPIV_checkbox, PYPIV_button, PYPIV_text_input, PYPIV_int_input, PYPIV_label 
 
 
 #this is the main class which everything runs from
@@ -25,63 +25,36 @@ class PIV_GUI():
     def __init__(self):
         #all of this is just laying out the window
         app = QApplication([])
-        window = QWidget()
-        window.setGeometry(30,100,1000,750)
-        
-        #create a font
-        self.font = QFont('SansSerif',13)
+        window = PYPIV_window(30,100,1000,750)
         
         #declare variables
         self.imagearray = np.zeros((2,2,2))
         
         #creates button connected to file selection routine
-        self.fileSelection = QPushButton(window)
-        self.fileSelection.setText('Choose Images')
+        self.fileSelection = PYPIV_button(window, 'Choose Images', 0,0)
         self.fileSelection.clicked.connect(self.fileWindow)
-        self.fileSelection.setFont(self.font)
         
         #checking masks files
-        self.mask = checkBox('Masks option', window)
-        self.mask.mover(500,220)
+        self.mask = PYPIV_checkbox(window,'Masks option',550,310)
         
         #straddling Boolean
-        self.straddle = checkBox('Straddling', window)
-        self.straddle.mover(400,220)
+        self.straddle = PYPIV_checkbox(window, 'Straddling', 400, 310)
         
         #laying out numberical input objects
-        self.windowSize = inputBox('Window Size',window)
-        self.windowSize.move(400,25)
-        self.windowSize.title.move(400,10)
-        self.windowSize.setFont(self.font)
+        self.windowSize = PYPIV_int_input(window,'Window Size',400,10)
         
-        self.stepSize = inputBox('Step Size',window)
-        self.stepSize.move(400,75)
-        self.stepSize.title.move(400,60)
-        self.stepSize.setFont(self.font)
+        self.stepSize = PYPIV_int_input(window,'Step Size',400,85)
         
-        self.numImage = inputBox('Number of Image Pairs',window)
-        self.numImage.move(400,125)
-        self.numImage.title.move(400,110)
-        self.numImage.setFont(self.font)
+        self.numImage = PYPIV_int_input(window,'Number of Image Pairs',400,160)
         
-        self.imageStep = inputBox('Image Step',window)
-        self.imageStep.move(400,175)
-        self.imageStep.title.move(400,160)
-        self.imageStep.setFont(self.font)
+        self.imageStep = PYPIV_int_input(window,'Image Step',400,235)
         
         #run buttons
-        self.Xcorr = QPushButton(window)
-        self.Xcorr.setText('PIV XCorr')
-        self.Xcorr.move(20,440)
+        self.Xcorr = PYPIV_button(window,'PIV FFT',20,440)
         self.Xcorr.clicked.connect(self.Xcorr_run)
-        self.Xcorr.setFont(self.font)
         
-        self.CNN = QPushButton(window)
-        self.CNN.setText('PIV CNN')
-        self.CNN.move(120,440)
+        self.CNN = PYPIV_button(window,'PIV CNN',120,440)
         self.CNN.clicked.connect(self.CNN_run)
-        self.CNN.setFont(self.font)
-        
         
         window.show()
         app.exec_()
@@ -90,19 +63,14 @@ class PIV_GUI():
         
     #creates window to run cross correlation from
     def Xcorr_run(self):
-        self.Xcorr_window = QWidget()
-        self.Xcorr_window.setGeometry(200,200,500,500)
+        self.Xcorr_window = PYPIV_window(200,200,500,500)
         
         #directory selection button
-        self.outdir = QPushButton('Choose Output Directory',self.Xcorr_window)
-        self.outdir.move(0,0)
-        self.outdir.setFont(self.font)
+        self.outdir = PYPIV_button(self.Xcorr_window,'Choose Output Directory',0,0)
         self.outdir.clicked.connect(self.direcSelection)
         
         #button to initiate FFT
-        self.fftbutton = QPushButton('Run FFT',self.Xcorr_window)
-        self.fftbutton.move(0,40)
-        self.fftbutton.setFont(self.font)
+        self.fftbutton = PYPIV_button(self.Xcorr_window,'Run FFT',0,40)
         self.fftbutton.clicked.connect(self.FFT_analysis)
         
         #brings up window
@@ -119,18 +87,11 @@ class PIV_GUI():
 #calls the FFT function with objects from the main window
     def FFT_analysis(self):
         self.Xcorr_window.close()
-        self.progresswindow = QWidget()
-        self.progresswindow.setGeometry(300,300,200,200)
+        self.progresswindow = PYPIV_window(300,300,200,200)
         
          #Labels to show progress 
-        self.imageloading = QLabel(self.progresswindow)
-        self.imageloading.move(0,0)
-        self.imageloading.setText('Analyzing Sets')
-        self.imageloading.setFont(self.font)
-        self.analysisprogress = QLabel(self.progresswindow)
-        self.analysisprogress.move(0,20)
-        self.analysisprogress.setText('                        ')
-        self.analysisprogress.setFont(self.font)
+        self.imageloading = PYPIV_label(self.progresswindow,'Analyzing Sets',0,0)
+        self.analysisprogress = PYPIV_label(self.progresswindow,'                  ',0,20)
         self.progresswindow.show()
         
         imshape = np.shape(self.imagearray)
@@ -152,7 +113,7 @@ class PIV_GUI():
             head = 'image %d and %d x,y,u,v' % (i,(i+1))
             
             #funstion that computes the velocities through simple FFT
-            x,y,u,v = PyPIV_FFT(self.imagearray[:,:,i], self.imagearray[:,:,i+1], self.windowSize.value, self.stepSize.value)
+            x,y,u,v = PyPIV_FFT(self.imagearray[:,:,i], self.imagearray[:,:,i+1], self.windowSize.value(), self.stepSize.value())
             
             #creating output file
             filename = self.outdirec + '/PIV_%04d.txt' % i
@@ -184,71 +145,35 @@ class PIV_GUI():
        
         
         #create new window
-        self.selectionWindow = QWidget()
-        self.selectionWindow.setGeometry(200,200,500,500)
-        
+        self.selectionWindow = PYPIV_window(200,200,500,600)
         
         
         #button to select first image
-        self.firstImage = QPushButton('Choose First Image',self.selectionWindow)
-        self.firstImage.move(0,0)
-        self.firstImage.setFont(self.font)
+        self.firstImage = PYPIV_button(self.selectionWindow,'Choose First Image',0,0)
         self.firstImage.clicked.connect(self.imageSelection)
         
         #button to load images into program
-        self.loadimages = QPushButton('Load Images',self.selectionWindow)
-        self.loadimages.move(150,450)
-        self.loadimages.setFont(self.font)
+        self.loadimages = PYPIV_button(self.selectionWindow,'Load Images',150,550)
         self.loadimages.clicked.connect(self.load)
         
         #textbox for directory
-        self.directorylabel = QLabel(self.selectionWindow)
-        self.directorylabel.move(0,50)
-        self.directorylabel.setText('Directory')
-        self.directorylabel.setFont(self.font)
-        self.directory = QLineEdit(self.selectionWindow)
-        self.directory.move(0,70)
+        self.directory = PYPIV_text_input(self.selectionWindow,'Directory',0,50)
         
         
         #textbox for file basename
-        self.basenamelabel = QLabel(self.selectionWindow)
-        self.basenamelabel.move(0,100)
-        self.basenamelabel.setText('Image Base Name')
-        self.basenamelabel.setFont(self.font)
-        self.basename = QLineEdit(self.selectionWindow)
-        self.basename.move(0,120)
+        self.basename = PYPIV_text_input(self.selectionWindow,'Image Base Name',0,125)
         
         #textbox for filetype
-        self.filetypelabel = QLabel(self.selectionWindow)
-        self.filetypelabel.move(0,150)
-        self.filetypelabel.setText('File Type')
-        self.filetypelabel.setFont(self.font)
-        self.filetype = QLineEdit(self.selectionWindow)
-        self.filetype.move(0,170)
+        self.filetype = PYPIV_text_input(self.selectionWindow,'File Type',0,200)
         
-        #textbox for number of digits
-        self.numdigitslabel = QLabel(self.selectionWindow)
-        self.numdigitslabel.move(0,200)
-        self.numdigitslabel.setText('Number of Digits')
-        self.numdigitslabel.setFont(self.font)
-        self.numdigits = QLineEdit(self.selectionWindow)
-        self.numdigits.move(0,220)
+        #textbox for number of digits 
+        self.numdigits = PYPIV_int_input(self.selectionWindow,'Number of Digits',0,275)
         
         #textbox for first image
-        self.firstimagelabel = QLabel(self.selectionWindow)
-        self.firstimagelabel.move(0,250)
-        self.firstimagelabel.setText('First Image')
-        self.firstimagelabel.setFont(self.font)
-        self.firstimage = QLineEdit(self.selectionWindow)
-        self.firstimage.move(0,270)
+        self.firstimage = PYPIV_int_input(self.selectionWindow,'First Image',0,350)
         
         #textbox for number of images
-        self.numimageslabel = QLabel(self.selectionWindow)
-        self.numimageslabel.move(0,300)
-        self.numimageslabel.setText('Number of Images')
-        self.numimageslabel.setFont(self.font)
-        self.numimages = QLineEdit(self.selectionWindow)
-        self.numimages.move(0,320)
+        self.numimages = PYPIV_int_input(self.selectionWindow,'Number of Images',0,425)
         
         #brings up window
         self.selectionWindow.show()
@@ -294,36 +219,29 @@ class PIV_GUI():
         
         #create a new window to show progress
         self.selectionWindow.close()
-        self.loadwindow = QWidget()
-        self.loadwindow.setGeometry(300,300,200,200)
+        self.loadwindow = PYPIV_window(300,300,200,200)
         
          #Labels to show progress 
-        self.imageloading = QLabel(self.loadwindow)
-        self.imageloading.move(0,0)
-        self.imageloading.setText('Loading Images')
-        self.imageloading.setFont(self.font)
-        self.progress = QLabel(self.loadwindow)
-        self.progress.move(0,20)
-        self.progress.setText('                        ')
-        self.progress.setFont(self.font)
+        self.imageloading = PYPIV_label(self.loadwindow,'Loading Images',0,0)
+        self.progress = PYPIV_label(self.loadwindow,'                   ',0,20)
         self.loadwindow.show()
         
         
         
         #create template to call each file individually
-        filename = self.directory.text() + self.basename.text() + '%0' + self.numdigits.text() + 'd' + self.filetype.text()
+        filename = self.directory.value() + self.basename.value() + '%0' + ('%d'%self.numdigits.value()) + 'd' + self.filetype.value()
         
         #shape imarray with sample image
-        files = glob.glob(self.directory.text() + self.basename.text() + '*' + self.filetype.text())
+        files = glob.glob(self.directory.value() + self.basename.value() + '*' + self.filetype.value())
         dim = np.shape(np.array(Image.open(files[0])))
-        self.imagearray = np.zeros((dim[0], dim[1], int(self.numimages.text())))
+        self.imagearray = np.zeros((dim[0], dim[1], self.numimages.value()))
         
         #set up a string to show progress
-        progressstr = '%d / ' + '%d' % int(self.numimages.text())
+        progressstr = '%d / ' + '%d' % self.numimages.value()
         self.progress.setText(progressstr % 0)
         
         #load images in loop
-        for i in range(int(self.numimages.text())):
+        for i in range(self.numimages.value()):
             
             #update progress display
             self.progress.setText(progressstr % i)

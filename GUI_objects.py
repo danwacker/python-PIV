@@ -1,21 +1,9 @@
-import sys
-import os
-import glob
-
-import numpy as np
-from PIL import Image
-
-from PyQt5.QtWidgets import QListWidget, QPushButton, QLabel, QListWidgetItem, QRadioButton, QWidget, QFileDialog, QLineEdit, QApplication
-from PyQt5.QtGui import QPixmap, QIntValidator, QFont, QGuiApplication
+from PyQt5.QtWidgets import QPushButton, QLabel, QRadioButton, QWidget, QLineEdit
+from PyQt5.QtGui import QIntValidator, QFont
 #from PyQt5.QtCore import 
 
-from PyPIV_FFT import PyPIV_FFT
-
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-
-
+global font
+font = QFont('sansserif',15)
 
 #just a label
 class PYPIV_label(QLabel):
@@ -32,42 +20,38 @@ class PYPIV_label(QLabel):
 class PYPIV_int_input(QLineEdit):
     def __init__(self,window,text,x,y):
         super(PYPIV_int_input,self).__init__(window)
-        self.move(x,y+15)
+        self.move(x,y+30)
         self.setFont(font)
         self.title = PYPIV_label(window,text,x,y)
         self.setValidator(QIntValidator())
-        self.value = 0
-        self.textChanged.connect(self.change)
         
-        def change(self,num):
-            self.value = int(num)
+    def value(self):
+        return int(self.text())
             
             
 #text input box
 #use self.value to retrieve string
 class PYPIV_text_input(QLineEdit):
     def __init__(self,window,text,x,y):
-        super(PYPIV_int_input,self).__init__(window)
-        self.move(x,y+15)
+        super(PYPIV_text_input,self).__init__(window)
+        self.move(x,y+30)
         self.setFont(font)
         self.title = PYPIV_label(window,text,x,y)
-        self.value = ''
-        self.textChanged.connect(self.change)
         
-        def change(self,text):
-            self.value = text
+    def value(self):
+        return self.text()
             
             
             
 #Boolean input
 #use self.value to retrieve boolean value
-class PYPIV_checkBox(QRadioButton):
+class PYPIV_checkbox(QRadioButton):
     def __init__(self,window,text,x,y):
-        super(PYPIV_checkBox,self).__init__(window)
+        super(PYPIV_checkbox,self).__init__(window)
         self.title = PYPIV_label(window,text,x,y)
         self.value = False
         self.toggled.connect(self.change)
-        self.move(x,y+15)
+        self.move(x,y+30)
         
     def change(self, value):
         self.value = value
@@ -84,3 +68,4 @@ class PYPIV_button(QPushButton):
         super(PYPIV_button,self).__init__(window)
         self.move(x,y)
         self.setText(text)
+        self.setFont(font)
