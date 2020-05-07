@@ -152,9 +152,11 @@ class PIV_GUI():
         
     def load_cnn(self):
         self.cnn_file = QFileDialog.getOpenFileName()
+        self.cnn = cnn_load(self.cnn_file)
         
     def create_cnn(self):
         self.cnn_file = self.cnn_direc + self.cnn_name.value()
+        self.cnn = cnn_create(self.cnn_file)
         
         
         
