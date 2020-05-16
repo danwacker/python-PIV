@@ -17,6 +17,8 @@ from matplotlib.figure import Figure
 
 from GUI_objects import PYPIV_window, PYPIV_checkbox, PYPIV_button, PYPIV_text_input, PYPIV_int_input, PYPIV_label 
 
+from Network_functions import cnn_load, cnn_create
+
 
 #this is the main class which everything runs from
 #contains the QApplication to exectue
@@ -151,7 +153,7 @@ class PIV_GUI():
         self.cnn_create.clicked.connect(self.create_cnn)
         
     def load_cnn(self):
-        self.cnn_file = QFileDialog.getOpenFileName()
+        self.cnn_file = QFileDialog.getOpenFileName('*.h5')
         self.cnn = cnn_load(self.cnn_file)
         
     def create_cnn(self):
