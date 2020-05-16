@@ -139,18 +139,20 @@ class PIV_GUI():
         
         
     def CNN_run(self):
-        self.cnn_window = PYPIV_window(300,300,200,200)
+        self.cnn_window = PYPIV_window(500,300,300,250)
         
         self.cnn_direc_button = PYPIV_button(self.cnn_window, 'CNN directory', 20, 0)
         
         self.cnn_name = PYPIV_text_input(self.cnn_window, 'CNN name', 20, 50)
     
         
-        self.cnn_load = PYPIV_button(self.CNN_window, 'Load CNN', 120,100)
+        self.cnn_load = PYPIV_button(self.cnn_window, 'Load CNN', 20,180)
         self.cnn_load.clicked.connect(self.load_cnn)
         
-        self.cnn_create = PYPIV_button(self.CNN_window, 'Create New CNN',20,100)
+        self.cnn_create = PYPIV_button(self.cnn_window, 'Create New CNN',20,130)
         self.cnn_create.clicked.connect(self.create_cnn)
+        
+        self.cnn_window.show()
         
     def load_cnn(self):
         self.cnn_file = QFileDialog.getOpenFileName('*.h5')
