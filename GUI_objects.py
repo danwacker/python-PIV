@@ -12,7 +12,8 @@ class PYPIV_label(QLabel):
         self.move(x,y)
         self.setFont(font)
         self.setText(text)
-        
+    def value(self):
+        return self.text()
         
         
 #integer input box

@@ -5,7 +5,7 @@ from keras.layers.core import Dense, Dropout, Flatten, Activation
 from keras.layers.convolutional import Convolution2D
 from keras.optimizers import Adam
 from keras.layers.normalization import BatchNormalization
-from keras.layers import Input, MaxPooling2D, Subtract
+from keras.layers import Input, MaxPooling2D, concatenate
 from keras.models import Model
 from keras.layers.noise import GaussianNoise
 from keras.initializers import RandomNormal
@@ -38,8 +38,8 @@ def cnn_create(name):
     
     #single channel
     #find the difference of the sides
-    compare = [mod1, mod2]
-    compare = Flatten()(compare)
+    compare = concatenate([mod1, mod2])
+#    compare = Flatten()(compare)
     compare = Dropout(0.2)(compare)
     compare = Dense(256, kernel_initializer=standard_init)(compare)
     compare = BatchNormalization()(compare)
@@ -54,7 +54,7 @@ def cnn_create(name):
     
     fullmod.save(name + '.h5')
     
-    
+    return
     
     
     
