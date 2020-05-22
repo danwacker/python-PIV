@@ -17,7 +17,7 @@ from matplotlib.figure import Figure
 
 from GUI_objects import PYPIV_window, PYPIV_checkbox, PYPIV_button, PYPIV_text_input, PYPIV_int_input, PYPIV_label 
 
-from Network_functions import cnn_load, cnn_create
+from Network_functions import cnn_create, train
 
 
 #this is the main class which everything runs from
@@ -106,7 +106,7 @@ class PIV_GUI():
         pic = QLabel(self.figwin)
         self.figwin.setGeometry(500,300,1100,800)
         self.figwin.show()
-        for i in range(imshape[2]-1):
+        for i in range(imshape[2]-1):  
             #update progress display
             self.analysisprogress.setText(progressstr % i)
             #necessary for updating the GUI while processes are running
@@ -160,15 +160,35 @@ class PIV_GUI():
         self.cnn_direc_text.setText(QFileDialog.getExistingDirectory())
         
     def load_cnn(self):
-        self.cnn_file = QFileDialog.getOpenFileName('*.h5')
-        self.cnn = cnn_load(self.cnn_file)
+        self.cnn_file = QFileDialog.getOpenFileName()
+        print(self.cnn_file)
+        self.cnn_file = self.cnn_file[0]
         self.cnn_window.close()
+        self.cnn_use()
         
     def create_cnn(self):
-        self.cnn_file = self.cnn_direc_text.value() + '/' + self.cnn_name.value()
+        self.cnn_file = self.cnn_direc_text.value() + '/' + self.cnn_name.value() + '.h5'
         self.cnn = cnn_create(self.cnn_file)
+        self.cnn_window.close()
+        self.cnn_use()
         
+    def cnn_use(self):
+        self.cnn_use_window = PYPIV_window(500,300,300,250)
         
+        self.train_button = PYPIV_button(self.cnn_use_window, 'Train CNN', 20,30)
+        self.train_button.clicked.connect(self.train_cnn)
+        
+        self.use_button = PYPIV_button(self.cnn_use_window, 'Use CNN', 20, 110)
+        self.cnn_use_window.show()
+        
+    def train_cnn(self):
+        self.cnn_use_window.close()
+        
+        self.train_window = PYPIV_window(500,300,300,250)
+        self.status_text = PYPIV_label(self.train_window, 'training complete', 20, 70)
+        
+        self.train_direc = QFileDialog.getExistingDirectory()
+        train(self.cnn_file, self.train_direc, 200)
         
     #function creates and lays out a new window for choosing images
     def fileWindow(self):
